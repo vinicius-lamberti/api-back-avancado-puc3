@@ -54,122 +54,365 @@ def success_response(schema_name: str | None = None, description: str = SUCCESS_
 FAKESTORE_OPENAPI = {
 	"openapi": "3.1.0",
 	"info": {
-		"title": "FakeStoreAPI",
-		"description": "A free fake API for testing and prototyping e-commerce applications.",
-		"version": "v2.1.11",
+		"title": "FakeStoreAPI (Versão Estendida)",
+		"description": (
+			"Uma API falsa e gratuita para testes e prototipagem de aplicações de comércio eletrônico (e-commerce).\n\n"
+			"### ⭐ Extensões Customizadas (Funcionalidades Extras)\n"
+			"Esta versão estendida inclui recursos adicionais desenvolvidos exclusivamente para o projeto:\n"
+			"* **💝 Wishlists**: Gerenciamento de listas de desejos personalizadas por usuário.\n"
+			"* **🧾 Orders**: Sistema completo de finalização de compra (checkout) e histórico de pedidos de clientes."
+		),
+		"version": "v2.1.11-custom",
 		"contact": {
 			"email": "support@fakestoreapi.com",
-			"url": "https://fakestoreapi.com/docs",
+			"url": "https://fakestoreapi.com",
 		},
 		"x-logo": {"url": "/icons/logo.png", "href": "/"},
 	},
 	"tags": [
-		{"name": "Products", "x-displayName": "🛒 Products"},
-		{"name": "Carts", "x-displayName": "🛍️ Carts"},
-		{"name": "Users", "x-displayName": "👤 Users"},
-		{"name": "Auth", "x-displayName": "🔒 Auth"},
-		{"name": "Wishlists", "x-displayName": "💝 Wishlists"},
-		{"name": "Orders", "x-displayName": "🧾 Orders"},
+		# Features customizadas desenvolvidas para o projeto:
+		{
+			"name": "Wishlists",
+			"x-displayName": "💝 ⭐ Listas de Desejos [MINHA EXTENSÃO]",
+			"description": "Recurso personalizado para gerenciar os produtos favoritos dos usuários."
+		},
+		{
+			"name": "Orders",
+			"x-displayName": "🧾 ⭐ Pedidos [MINHA EXTENSÃO]",
+			"description": "Recurso personalizado para fechamento de compras e histórico de pedidos."
+		},
+		# Recursos originais da API FakeStoreAPI:
+		{
+			"name": "Products",
+			"x-displayName": "🛒 Produtos",
+			"description": "Endpoints originais para gerenciamento do catálogo de produtos."
+		},
+		{
+			"name": "Carts",
+			"x-displayName": "🛍️ Carrinhos",
+			"description": "Endpoints originais para gerenciamento de carrinhos de compras temporários."
+		},
+		{
+			"name": "Users",
+			"x-displayName": "👤 Usuários",
+			"description": "Endpoints originais para cadastro e perfis de usuários."
+		},
+		{
+			"name": "Auth",
+			"x-displayName": "🔒 Autenticação",
+			"description": "Endpoints originais para geração de tokens de login."
+		}
 	],
-	"servers": [{"url": "https://fakestoreapi.com"}],
+	"servers": [
+		{"url": "http://localhost:8000", "description": "Servidor de Desenvolvimento Local"}
+	],
 	"paths": {
 		"/products": {
 			"get": {
-				"summary": "Get all products",
-				"description": "Retrieve a list of all available products.",
+				"summary": "Obter todos os produtos",
+				"description": "Retorna uma lista contendo todos os produtos disponíveis no catálogo.",
 				"operationId": "getAllProducts",
 				"tags": ["Products"],
 				"responses": {
 					"200": success_response("Product"),
-					"400": {"description": BAD_REQUEST_DESCRIPTION},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}
 				},
 			},
 			"post": {
-				"summary": "Add a new product",
-				"description": "Create a new product.",
+				"summary": "Adicionar um novo produto",
+				"description": "Cria e registra um novo produto no catálogo.",
 				"operationId": "addProduct",
 				"tags": ["Products"],
 				"requestBody": {"required": True, "content": json_schema("Product")},
 				"responses": {
 					"201": {"description": "Product created successfully", "content": json_schema("Product")},
-					"400": {"description": BAD_REQUEST_DESCRIPTION},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}
 				},
 			},
 		},
 		"/products/{id}": {
 			"get": {
-				"summary": "Get a single product",
-				"description": "Retrieve details of a specific product by ID.",
+				"summary": "Obter um único produto",
+				"description": "Retorna os detalhes de um produto específico filtrado pelo ID.",
 				"operationId": "getProductById",
 				"tags": ["Products"],
 				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
-				"responses": {"200": success_response("Product"), "400": {"description": BAD_REQUEST_DESCRIPTION}},
+				"responses": {
+					"200": success_response("Product"),
+					"400": {"description": BAD_REQUEST_DESCRIPTION},
+					"404": {"description": "Produto não encontrado"}
+				},
 			},
 			"put": {
-				"summary": "Update a product",
-				"description": "Update an existing product by ID.",
+				"summary": "Atualizar um produto",
+				"description": "Atualiza as informações de um produto existente com base no ID fornecido.",
 				"operationId": "updateProduct",
 				"tags": ["Products"],
 				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
 				"requestBody": {"required": True, "content": json_schema("Product")},
-				"responses": {"200": {"description": "Product updated successfully", "content": json_schema("Product")}, "400": {"description": BAD_REQUEST_DESCRIPTION}},
+				"responses": {
+					"200": {"description": "Product updated successfully", "content": json_schema("Product")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}
+				},
 			},
 			"delete": {
-				"summary": "Delete a product",
-				"description": "Delete a specific product by ID.",
+				"summary": "Excluir um produto",
+				"description": "Remove permanentemente um produto específico do catálogo usando o ID.",
 				"operationId": "deleteProduct",
 				"tags": ["Products"],
 				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
-				"responses": {"200": {"description": "Product deleted successfully"}, "400": {"description": BAD_REQUEST_DESCRIPTION}},
+				"responses": {
+					"200": {"description": "Product deleted successfully"},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}
+				},
 			},
 		},
 		"/carts": {
-			"get": {"summary": "Get all carts", "description": "Retrieve a list of all available carts.", "operationId": "getAllCarts", "tags": ["Carts"], "responses": {"200": success_response("Cart"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"post": {"summary": "Add a new cart", "description": "Create a new cart.", "operationId": "addCart", "tags": ["Carts"], "requestBody": {"required": True, "content": json_schema("Cart")}, "responses": {"201": {"description": "Cart created successfully", "content": json_schema("Cart")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"get": {
+				"summary": "Obter todos os carrinhos",
+				"description": "Retorna uma lista de todos os carrinhos de compras ativos.",
+				"operationId": "getAllCarts",
+				"tags": ["Carts"],
+				"responses": {"200": success_response("Cart"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"post": {
+				"summary": "Adicionar um novo carrinho",
+				"description": "Cria um novo carrinho de compras para um usuário.",
+				"operationId": "addCart",
+				"tags": ["Carts"],
+				"requestBody": {"required": True, "content": json_schema("Cart")},
+				"responses": {
+					"201": {"description": "Cart created successfully", "content": json_schema("Cart")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				}
 		},
 		"/carts/{id}": {
-			"get": {"summary": "Get a single cart", "description": "Retrieve details of a specific cart by ID.", "operationId": "getCartById", "tags": ["Carts"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": success_response("Cart"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"put": {"summary": "Update a cart", "description": "Update an existing cart by ID.", "operationId": "updateCart", "tags": ["Carts"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "requestBody": {"required": True, "content": json_schema("Cart")}, "responses": {"200": {"description": "Cart updated successfully", "content": json_schema("Cart")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"delete": {"summary": "Delete a cart", "description": "Delete a specific cart by ID.", "operationId": "deleteCart", "tags": ["Carts"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Cart deleted successfully"}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"get": {
+				"summary": "Obter um único carrinho",
+				"description": "Retorna as informações de um carrinho baseado no ID.",
+				"operationId": "getCartById", "tags": ["Carts"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": success_response("Cart"),
+					"400": {"description": BAD_REQUEST_DESCRIPTION},
+					"404": {"description": "Carrinho não encontrado"}
+				}},
+			"put": {
+				"summary": "Atualizar um carrinho",
+				"description": "Atualiza os itens de um carrinho existente por ID.",
+				"operationId": "updateCart",
+				"tags": ["Carts"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"requestBody": {"required": True, "content": json_schema("Cart")},
+				"responses": {
+					"200": {"description": "Cart updated successfully", "content": json_schema("Cart")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				},
+			"delete": {
+				"summary": "Excluir um carrinho",
+				"description": "Remove um carrinho de compras específico através do ID.",
+				"operationId": "deleteCart", "tags": ["Carts"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": {"description": "Cart deleted successfully"},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				},
 		},
 		"/users": {
-			"get": {"summary": "Get all users", "description": "Retrieve a list of all users.", "operationId": "getAllUsers", "tags": ["Users"], "responses": {"200": success_response("User"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"post": {"summary": "Add a new user", "description": "Create a new user.", "operationId": "addUser", "tags": ["Users"], "requestBody": {"required": True, "content": json_schema("User")}, "responses": {"201": {"description": "User created successfully", "content": json_schema("User")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"get": {
+				"summary": "Obter todos os usuários",
+				"description": "Retorna uma listagem de todos os usuários cadastrados.",
+				"operationId": "getAllUsers", "tags": ["Users"],
+				"responses": {"200": success_response("User"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"post": {
+				"summary": "Adicionar um novo usuário",
+				"description": "Registra e cria um novo perfil de usuário no sistema.",
+				"operationId": "addUser", "tags": ["Users"],
+				"requestBody": {"required": True, "content": json_schema("User")},
+				"responses": {
+					"201": {"description": "User created successfully","content": json_schema("User")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				},
 		},
 		"/users/{id}": {
-			"get": {"summary": "Get a single user", "description": "Retrieve details of a specific user by ID.", "operationId": "getUserById", "tags": ["Users"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": success_response("User"), "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"put": {"summary": "Update a user", "description": "Update an existing user by ID.", "operationId": "updateUser", "tags": ["Users"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "requestBody": {"required": True, "content": json_schema("User")}, "responses": {"200": {"description": "User updated successfully", "content": json_schema("User")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
-			"delete": {"summary": "Delete a user", "description": "Delete a specific user by ID.", "operationId": "deleteUser", "tags": ["Users"], "parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": {"description": "User deleted successfully"}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"get": {
+				"summary": "Obter um único usuário",
+				"description": "Retorna as informações cadastrais de um usuário específico por ID.",
+				"operationId": "getUserById", "tags": ["Users"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": success_response("User"),
+					"400": {"description": BAD_REQUEST_DESCRIPTION},
+					"404": {"description": "Usuário não encontrado"}
+					}
+				},
+			"put": {
+				"summary": "Atualizar um usuário",
+				"description": "Modifica os dados de um usuário existente com base em seu ID.",
+				"operationId": "updateUser", "tags": ["Users"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"requestBody": {"required": True, "content": json_schema("User")},
+				"responses": {
+					"200": {"description": "User updated successfully", "content": json_schema("User")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				},
+			"delete": {
+				"summary": "Excluir um usuário",
+				"description": "Remove de forma definitiva o perfil de um usuário pelo ID.",
+				"operationId": "deleteUser", "tags": ["Users"],
+				"parameters": [{"name": "id", "in": "path", "required": True, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": {"description": "User deleted successfully"},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}}
+				},
 		},
 		"/auth/login": {
-			"post": {"summary": "Login", "description": "Authenticate a user.", "operationId": "loginUser", "tags": ["Auth"], "requestBody": {"required": True, "content": json_schema("Login")}, "responses": {"200": {"description": "Login successful", "content": json_schema("LoginResponse")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+			"post": {
+				"summary": "Autenticação de Usuário (Login)",
+				"description": "Valida as credenciais do usuário e retorna um token de acesso.",
+				"operationId": "loginUser", "tags": ["Auth"],
+				"requestBody": {"required": True, "content": json_schema("Login")},
+				"responses": {
+					"200": {"description": "Login efetuado com sucesso","content": json_schema("LoginResponse")},
+					"400": {"description": BAD_REQUEST_DESCRIPTION}},
+					"401": {"description": "Falha na autenticação"},
+					"502": {"description": "FakeStoreAPI indisponível"}
+				},
 		},
 		"/wishlists": {
-			"post": {"summary": "Create a wishlist", "description": "Create a wishlist for a user.", "operationId": "createWishlist", "tags": ["Wishlists"], "requestBody": {"required": True, "content": json_schema("WishlistCreate")}, "responses": {"201": {"description": "Wishlist created", "content": json_schema("Wishlist")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+		"post": {
+			"summary": "Criar uma lista de desejos", 
+			"description": "Gera uma nova lista de desejos vinculada a um usuário específico.", 
+			"operationId": "createWishlist", 
+			"tags": ["Wishlists"], 
+			"requestBody": {"required": True, "content": json_schema("WishlistCreate")}, 
+			"responses": {
+				"201": {"description": "Lista de desejos criada com sucesso", "content": json_schema("Wishlist")}, 
+				"400": {"description": "Usuário já possui 4 wishlists"}
+			}
 		},
-		"/wishlists/user/{user_id}": {
-			"get": {"summary": "List wishlists by user", "description": "Retrieve all wishlists for a specific user.", "operationId": "listUserWishlists", "tags": ["Wishlists"], "parameters": [{"name": "user_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": {"description": SUCCESS_DESCRIPTION, "content": {APPLICATION_JSON: {"schema": {"type": "array", "items": ref("Wishlist")}}}}}},
+	},
+	"/wishlists/user/{user_id}": {
+		"get": {
+			"summary": "Listar listas de desejos por usuário", 
+			"description": "Retorna todas as listas de desejos pertencentes a um usuário específico.", 
+			"operationId": "listUserWishlists", 
+			"tags": ["Wishlists"], 
+			"parameters": [{"name": "user_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"responses": {
+				"200": {
+					"description": SUCCESS_DESCRIPTION, 
+					"content": {APPLICATION_JSON: {"schema": {"type": "array", "items": ref("Wishlist")}}}
+				}
+			}
 		},
-		"/wishlists/{wishlist_id}": {
-			"get": {"summary": "Get a wishlist", "description": "Retrieve a specific wishlist.", "operationId": "getWishlist", "tags": ["Wishlists"], "parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": success_response("Wishlist"), "404": {"description": WISHLIST_NOT_FOUND_DESCRIPTION}}},
-			"put": {"summary": "Update a wishlist", "description": "Update a wishlist name.", "operationId": "updateWishlist", "tags": ["Wishlists"], "parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "requestBody": {"required": True, "content": json_schema("WishlistUpdate")}, "responses": {"200": success_response("Wishlist"), "404": {"description": WISHLIST_NOT_FOUND_DESCRIPTION}}},
-			"delete": {"summary": "Delete wishlist", "description": "Delete a wishlist by ID.", "operationId": "deleteWishlist", "tags": ["Wishlists"], "parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Wishlist deleted"}, "404": {"description": WISHLIST_NOT_FOUND_DESCRIPTION}}},
+	},
+	"/wishlists/{wishlist_id}": {
+		"get": {
+			"summary": "Obter uma lista de desejos", 
+			"description": "Retorna os detalhes de uma lista de desejos específica.", 
+			"operationId": "getWishlist", 
+			"tags": ["Wishlists"], 
+			"parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"responses": {
+				"200": success_response("Wishlist"), 
+				"404": {"description": "Wishlist não encontrada"}
+			}
 		},
-		"/wishlists/{wishlist_id}/items": {
-			"post": {"summary": "Add item to wishlist", "description": "Add a product to a wishlist.", "operationId": "addWishlistItem", "tags": ["Wishlists"], "parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "requestBody": {"required": True, "content": json_schema("WishlistItemCreate")}, "responses": {"201": {"description": "Item created", "content": json_schema("WishlistItem")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+		"put": {
+			"summary": "Atualizar uma lista de desejos", 
+			"description": "Atualiza o nome de uma lista de desejos existente.", 
+			"operationId": "updateWishlist", 
+			"tags": ["Wishlists"], 
+			"parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"requestBody": {"required": True, "content": json_schema("WishlistUpdate")}, 
+			"responses": {
+				"200": success_response("Wishlist"), 
+				"404": {"description": "Wishlist não encontrada"}
+			}
 		},
-		"/wishlists/{wishlist_id}/items/{product_id}": {
-			"delete": {"summary": "Delete wishlist item", "description": "Remove an item from a wishlist.", "operationId": "deleteWishlistItem", "tags": ["Wishlists"], "parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}, {"name": "product_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Item deleted"}, "404": {"description": "Item not found"}}},
+		"delete": {
+			"summary": "Excluir uma lista de desejos", 
+			"description": "Remove permanentemente uma lista de desejos pelo ID.", 
+			"operationId": "deleteWishlist", 
+			"tags": ["Wishlists"], 
+			"parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"responses": {
+				"204": {"description": "Lista de desejos excluída com sucesso"}, 
+				"404": {"description": WISHLIST_NOT_FOUND_DESCRIPTION}
+			}
 		},
-		"/orders": {
-			"post": {"summary": "Create order", "description": "Create a new order for a user.", "operationId": "createOrder", "tags": ["Orders"], "requestBody": {"required": True, "content": json_schema("CreateOrderPayload")}, "responses": {"201": {"description": "Order created", "content": json_schema("Order")}, "400": {"description": BAD_REQUEST_DESCRIPTION}}},
+	},
+	"/wishlists/{wishlist_id}/items": {
+		"post": {
+			"summary": "Adicionar item à lista de desejos", 
+			"description": "Adiciona um produto específico dentro de uma lista de desejos existente.", 
+			"operationId": "addWishlistItem", 
+			"tags": ["Wishlists"], 
+			"parameters": [{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"requestBody": {"required": True, "content": json_schema("WishlistItemCreate")}, 
+			"responses": {
+				"201": {"description": "Item adicionado com sucesso", "content": json_schema("WishlistItem")}, 
+				"400": {"description": "Produto já está na wishlist"}
+			}
 		},
-		"/orders/user/{user_id}": {
-			"get": {"summary": "List orders by user", "description": "Retrieve orders for a specific user.", "operationId": "listUserOrders", "tags": ["Orders"], "parameters": [{"name": "user_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": {"description": SUCCESS_DESCRIPTION, "content": {APPLICATION_JSON: {"schema": {"type": "array", "items": ref("Order")}}}}}},
+	},
+	"/wishlists/{wishlist_id}/items/{product_id}": {
+		"delete": {
+			"summary": "Excluir item da lista de desejos", 
+			"description": "Remove um produto de dentro de uma lista de desejos.", 
+			"operationId": "deleteWishlistItem", 
+			"tags": ["Wishlists"], 
+			"parameters": [
+				{"name": "wishlist_id", "in": "path", "required": True, "schema": {"type": "integer"}}, 
+				{"name": "product_id", "in": "path", "required": True, "schema": {"type": "integer"}}
+			], 
+			"responses": {
+				"204": {"description": "Item excluído com sucesso"}, 
+				"404": {"description": "Item não encontrado"}
+			}
 		},
-		"/orders/{order_id}": {
-			"get": {"summary": "Get order", "description": "Retrieve a specific order.", "operationId": "getOrder", "tags": ["Orders"], "parameters": [{"name": "order_id", "in": "path", "required": True, "schema": {"type": "integer"}}], "responses": {"200": success_response("Order"), "404": {"description": "Order not found"}}},
+	},
+	"/orders": {
+		"post": {
+			"summary": "Criar um pedido", 
+			"description": "Registra uma nova compra/pedido para um usuário.", 
+			"operationId": "createOrder", 
+			"tags": ["Orders"], 
+			"requestBody": {"required": True, "content": json_schema("CreateOrderPayload")}, 
+			"responses": {
+				"201": {"description": "Pedido criado com sucesso", "content": json_schema("Order")}, 
+				"400": {"description": "Pedido deve possuir itens"}
+			}
 		},
+	},
+	"/orders/user/{user_id}": {
+		"get": {
+			"summary": "Listar pedidos por usuário", 
+			"description": "Retorna o histórico de pedidos realizados por um usuário específico.", 
+			"operationId": "listUserOrders", 
+			"tags": ["Orders"], 
+			"parameters": [{"name": "user_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"responses": {
+				"200": {
+					"description": SUCCESS_DESCRIPTION, 
+					"content": {APPLICATION_JSON: {"schema": {"type": "array", "items": ref("Order")}}}
+				}
+			}
+		},
+	},
+	"/orders/{order_id}": {
+		"get": {
+			"summary": "Obter detalhes de um pedido", 
+			"description": "Retorna as informações detalhadas de um pedido específico utilizando o ID informado.", 
+			"operationId": "getOrder", 
+			"tags": ["Orders"], 
+			"parameters": [{"name": "order_id", "in": "path", "required": True, "schema": {"type": "integer"}}], 
+			"responses": {
+				"200": success_response("Order"), 
+				"404": {"description": "Pedido não encontrado"}
+			}
+		},
+	},
 	},
 	"components": {
 		"schemas": {
