@@ -14,7 +14,7 @@ async def lifespan(_: FastAPI):
 	yield
 
 
-app = FastAPI(title="API Back Avançado PUC3", lifespan=lifespan)
+app = FastAPI(title="API Back Avançado PUC3", servers=[{"url": "/api"}], lifespan=lifespan)
 
 app.add_middleware(
 	CORSMiddleware,
@@ -104,7 +104,7 @@ FAKESTORE_OPENAPI = {
 		}
 	],
 	"servers": [
-		{"url": "http://localhost:8000", "description": "Servidor de Desenvolvimento Local"}
+		{"url": "/api", "description": "Servidor de Desenvolvimento Local"}
 	],
 	"paths": {
 		"/products": {
